@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>International Student Demand — Visa Grants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+<script src="https://pdparker.github.io/dashboard-commons/commons.js" data-dash="intl-demand"></script>
+<style>
+:root{
+  --purple:#3C1053; --purple-2:#5A2A78; --purple-lite:#6E4B9E;
+  --red:#F2120C; --red-soft:rgba(242,18,12,.10);
+  --sand:#FBF6F0; --sand-2:#F3EBE1; --card:#FFFFFF;
+  --ink:#1E1B18; --muted:#5C5651; --line:rgba(30,27,24,.10);
+  --gold:#B8860B; --slate:#3E6D8E; --ok:#2E7D5B;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:Arial,Helvetica,sans-serif;background:var(--sand);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
+/* ── Masthead ── */
+.masthead{background:linear-gradient(135deg,#2A0B3B 0%,var(--purple) 55%,#4A1A66 100%);color:#fff;padding:26px 32px 22px;}
+.mh-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.mh-title{font-size:1.6rem;font-weight:800;letter-spacing:-.02em;line-height:1.05;}
+.mh-sub{font-size:.82rem;color:rgba(255,255,255,.72);margin-top:6px;max-width:720px;line-height:1.5;}
+.mh-ctrls{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+.ctrl{display:flex;flex-direction:column;gap:4px;}
+.ctrl label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.55);}
+.ctrl select{font-family:Arial,Helvetica,sans-serif;font-size:.8rem;font-weight:600;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:8px;padding:8px 12px;cursor:pointer;outline:none;min-width:220px;}
+.ctrl select option{color:#1E1B18;}
+.btn-csv{font-family:Arial,Helvetica,sans-serif;font-size:.78rem;font-weight:700;color:#fff;background:var(--red);border:none;border-radius:8px;padding:9px 16px;cursor:pointer;align-self:flex-end;white-space:nowrap;transition:filter .15s;}
+.btn-csv:hover{filter:brightness(1.08);}
+/* ── KPI row ── */
+.main{padding:22px 32px 56px;max-width:1500px;margin:0 auto;}
+.krow{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px;}
+.kpi{background:var(--card);border-radius:14px;padding:20px 22px;box-shadow:0 4px 22px rgba(60,16,83,.06);border:1px solid var(--line);position:relative;overflow:hidden;}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--purple);}
+.kpi.k-red::before{background:var(--red);}
+.kpi.k-gold::before{background:var(--gold);}
+.kpi.k-slate::before{background:var(--slate);}
+.klbl{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px;line-height:1.3;min-height:2.4em;}
+.kval{font-family:'Manrope';font-size:2.15rem;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--ink);}
+.ksub{font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.4;}
+.kdelta{font-size:.72rem;font-weight:700;margin-top:6px;display:inline-flex;align-items:center;gap:4px;}
+.kdelta.down{color:var(--red);} .kdelta.up{color:var(--ok);} .kdelta.flat{color:var(--muted);}
+/* ── Cards ── */
+.card{background:var(--card);border-radius:14px;padding:22px 24px;box-shadow:0 4px 22px rgba(60,16,83,.06);border:1px solid var(--line);margin-bottom:20px;}
+.card-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
+.card-t{font-size:1.02rem;font-weight:700;color:var(--ink);letter-spacing:-.01em;}
+.card-s{font-size:.74rem;color:var(--muted);margin-top:3px;max-width:760px;line-height:1.5;}
+.grid-2{display:grid;grid-template-columns:1.5fr 1fr;gap:24px;align-items:start;}
+.chart-wrap{position:relative;height:300px;width:100%;}
+.chart-wrap.tall{height:340px;}
+.chart-wrap.small{height:220px;}
+/* stat strip */
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(58px,1fr));gap:8px;margin-top:8px;}
+.strip-c{background:var(--sand);border-radius:9px;padding:8px 6px;text-align:center;border:1px solid var(--line);}
+.strip-c.partial{border-style:dashed;border-color:var(--gold);background:rgba(184,134,11,.06);}
+.strip-y{font-size:.56rem;font-weight:700;color:var(--muted);letter-spacing:.03em;}
+.strip-v{font-family:'Manrope';font-size:.86rem;font-weight:800;color:var(--purple);margin-top:2px;}
+.strip-c.partial .strip-v{color:var(--gold);}
+.strip-n{font-size:.54rem;color:var(--muted);margin-top:1px;}
+/* ranked bars */
+.bars{display:flex;flex-direction:column;gap:9px;}
+.bar-row{display:grid;grid-template-columns:190px 1fr 150px;align-items:center;gap:12px;}
+.bar-lbl{font-size:.76rem;color:var(--ink);line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bar-track{position:relative;height:20px;background:var(--sand-2);border-radius:5px;overflow:hidden;}
+.bar-fill{position:absolute;left:0;top:0;bottom:0;background:var(--purple);border-radius:5px;}
+.bar-fill.red{background:var(--red);}
+.bar-val{font-size:.74rem;color:var(--muted);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.bar-val b{font-family:'Manrope';color:var(--ink);font-weight:700;}
+.bar-val .rate{color:var(--purple);font-weight:700;}
+.legend{display:flex;gap:16px;font-size:.68rem;color:var(--muted);margin-bottom:12px;flex-wrap:wrap;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.swatch{width:12px;height:12px;border-radius:3px;display:inline-block;}
+/* country select */
+.card-sel{font-family:Arial,Helvetica,sans-serif;font-size:.78rem;font-weight:600;color:var(--purple);background:var(--sand);border:1px solid rgba(60,16,83,.28);border-radius:8px;padding:6px 10px;cursor:pointer;outline:none;min-width:200px;}
+.chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.chip-lbl{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+/* duo bar (onshore/offshore) */
+.duo{display:flex;height:38px;border-radius:9px;overflow:hidden;border:1px solid var(--line);margin-top:4px;}
+.duo-seg{display:flex;align-items:center;justify-content:center;color:#fff;font-size:.76rem;font-weight:700;font-family:'Manrope';letter-spacing:-.01em;}
+.duo-seg.on{background:var(--purple);}
+.duo-seg.off{background:var(--red);}
+.duo-legend{display:flex;gap:20px;font-size:.72rem;color:var(--muted);margin-top:10px;flex-wrap:wrap;}
+/* caveats */
+.caveats{background:linear-gradient(180deg,#fff 0%,var(--sand) 100%);border:1px solid var(--line);border-left:4px solid var(--gold);}
+.caveats .card-t{display:flex;align-items:center;gap:8px;}
+.cav-list{list-style:none;display:flex;flex-direction:column;gap:12px;margin-top:4px;}
+.cav-list li{font-size:.8rem;line-height:1.55;color:var(--ink);padding-left:22px;position:relative;}
+.cav-list li::before{content:"▸";position:absolute;left:2px;top:0;color:var(--gold);font-size:.8rem;}
+.cav-list li b{color:var(--purple);}
+.mininote{font-size:.72rem;color:var(--muted);line-height:1.5;background:rgba(184,134,11,.07);border:1px dashed rgba(184,134,11,.4);border-radius:10px;padding:12px 14px;margin-top:14px;}
+.mininote b{color:#8a6400;}
+.footnote{font-size:.68rem;color:var(--muted);margin-top:12px;line-height:1.5;font-style:italic;}
+.foot{font-size:.7rem;color:var(--muted);line-height:1.6;padding:8px 4px 0;border-top:1px solid var(--line);margin-top:8px;}
+.foot b{color:var(--ink);}
+.sec-eyebrow{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:14px;padding-top:6px;}
+.empty{font-size:.8rem;color:var(--muted);font-style:italic;padding:20px 0;text-align:center;}
+.subhd{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;}
+@media(max-width:1080px){.krow{grid-template-columns:repeat(2,1fr);}.grid-2{grid-template-columns:1fr;}.bar-row{grid-template-columns:150px 1fr 130px;}}
+@media(max-width:620px){.main{padding:16px;}.masthead{padding:18px 16px;}.krow{grid-template-columns:1fr;}.bar-row{grid-template-columns:120px 1fr;}.bar-val{grid-column:1/-1;text-align:left;}.mh-ctrls{width:100%;}.ctrl select{min-width:0;width:100%;}}
+@media print{
+  .mh-ctrls,.chips,.btn-csv{display:none!important;}
+  .card,.kpi,.caveats{break-inside:avoid;box-shadow:none;}
+  body{background:#fff;}
+  .masthead{background:var(--purple)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="mh-top">
+    <div>
+      <h1 class="mh-title">International Student Demand</h1>
+      <div class="mh-sub" id="mh-sub">Department of Home Affairs student-visa grants (subclass 500, primary applicants) by source country and education sector — the demand complement to CRICOS course supply.</div>
+    </div>
+    <div class="mh-ctrls">
+      <div class="ctrl">
+        <label for="sel-year">Year</label>
+        <select id="sel-year"></select>
+      </div>
+      <button class="btn-csv" id="btn-csv">&#8681; Export CSV</button>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <!-- 2. KPI row -->
+  <div class="krow" id="kpis"></div>
+
+  <!-- 3. National trend -->
+  <div class="card">
+    <div class="card-hd">
+      <div>
+        <div class="card-t">National trend — visa grants by financial year</div>
+        <div class="card-s" id="trend-sub">Primary student-visa grants, 2005-06 to 2024-25. The final point is the 2025-26 partial year (to 31 May 2026) — dashed and hollow, not comparable with a full year.</div>
+      </div>
+    </div>
+    <div class="chart-wrap tall"><canvas id="ch-trend"></canvas></div>
+    <div class="strip" id="strip-trend"></div>
+    <div class="mininote" id="trend-note"></div>
+  </div>
+
+  <!-- 4. By sector -->
+  <div class="card">
+    <div class="card-hd">
+      <div>
+        <div class="card-t">By sector — <span id="sector-year">2024-25</span></div>
+        <div class="card-s">Grants by education sector for the selected year, ranked. Right: the Higher Education vs VET share swing over the full series — the most consequential sector shift in the data.</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="bars" id="bars-sector"></div>
+      <div>
+        <div class="subhd">Sector share of total grants, by year</div>
+        <div class="chart-wrap small"><canvas id="ch-sector-share"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Top source countries -->
+  <div class="card">
+    <div class="card-hd">
+      <div>
+        <div class="card-t">Top source countries — <span id="cty-year">2024-25</span></div>
+        <div class="card-s">Top 15 source countries by primary student-visa grants for the selected year, with each country's share of that year's national total.</div>
+      </div>
+    </div>
+    <div class="bars" id="bars-country"></div>
+  </div>
+
+  <!-- 6. Country explorer -->
+  <div class="sec-eyebrow">Country explorer</div>
+  <div class="card">
+    <div class="card-hd">
+      <div>
+        <div class="card-t" id="exp-title">Country explorer — China</div>
+        <div class="card-s">Grant trend for one source country across the full series, and its sector mix in the latest full year (2024-25) — nationalities differ sharply in which sector they enter.</div>
+      </div>
+      <div class="chips">
+        <span class="chip-lbl">Country</span>
+        <select class="card-sel" id="sel-country"></select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <div class="subhd">Grants by year</div>
+        <div class="chart-wrap"><canvas id="ch-country"></canvas></div>
+      </div>
+      <div>
+        <div class="subhd" id="exp-sector-hd">Sector mix — 2024-25 (latest full year)</div>
+        <div class="bars" id="bars-exp-sector"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Onshore / offshore -->
+  <div class="card">
+    <div class="card-hd">
+      <div>
+        <div class="card-t">Onshore / offshore — <span id="loc-year">2024-25</span></div>
+        <div class="card-s">Share of grants made <b>in</b> Australia (onshore — largely transitions and further study by people already here) vs <b>outside</b> Australia (offshore — genuinely new arrivals), for the selected year, with offshore share over the full series below.</div>
+      </div>
+    </div>
+    <div class="duo" id="duo-loc"></div>
+    <div class="duo-legend">
+      <span><span class="swatch" style="background:var(--purple)"></span> Onshore (in Australia)</span>
+      <span><span class="swatch" style="background:var(--red)"></span> Offshore (outside Australia)</span>
+    </div>
+    <div class="subhd" style="margin-top:18px;">Offshore share of grants, by year</div>
+    <div class="strip" id="strip-loc"></div>
+  </div>
+
+  <!-- 8. Caveats -->
+  <div class="card caveats">
+    <div class="card-t">&#9888;&#65039; Read the numbers with these caveats</div>
+    <ul class="cav-list" style="margin-top:14px;">
+      <li><b>These are visa GRANTS, not applications and not enrolments.</b> A grant means a subclass 500 student visa was issued — it is a demand-<i>realised</i> signal (who was let in), one step removed from who applied and one step further from who enrolled or commenced study.</li>
+      <li><b>Primary applicants only.</b> Dependants (partners, children — secondary applicants) travelling with the student are excluded from every count on this page.</li>
+      <li><b>National / sector / source-country only — no institution or provider detail.</b> Home Affairs publishes the provider's <i>state</i> but not individual providers, so there is no institution-level or ACU view here. This is macro demand intelligence, not a provider dashboard.</li>
+      <li><b>2025-26 is a partial year</b> (to 31 May 2026 only) — shown dashed throughout and never compared directly against a full financial year's total.</li>
+      <li><b>Policy context.</b> The 2022-23 peak (~500k) was the post-COVID rebound; the fall since reflects tightened settings — Ministerial Direction 107, then 111, higher financial and English-language requirements, and National Planning Level / provider caps from 2025.</li>
+      <li><b>Complements, but does not join, CRICOS.</b> CRICOS is course <i>supply</i> with no nationality data; this is visa <i>demand</i> with no course/provider data. They are separate datasets presented side by side — a demand&times;supply join is a possible future dashboard, not this one.</li>
+    </ul>
+  </div>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function(){
+  "use strict";
+  var V = window.VISADEMAND;
+  var HAS_DC = (typeof DashCommons !== 'undefined');
+
+  // ---- helpers ----
+  function fmtInt(n){ return Number(n||0).toLocaleString('en-AU'); }
+  function pct(x, d){ d = (d===undefined)?1:d; return (isFinite(x)?x:0).toFixed(d)+'%'; }
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+  // ---- derived constants ----
+  var FULL_YEARS = V.full_years.slice();                    // ascending, 20 full FYs
+  var PARTIAL_KEY = Object.keys(V.fyTotal).filter(function(k){ return FULL_YEARS.indexOf(k)===-1; })[0];
+  var PARTIAL_SHORT = PARTIAL_KEY.split(' to ')[0];          // "2025-26"
+  var PARTIAL_SUFFIX = PARTIAL_KEY.slice(PARTIAL_KEY.indexOf(' to ')).trim(); // "to 31 May 2026"
+  var LATEST_FULL = V.latest_full;
+  var ALL_KEYS = FULL_YEARS.concat([PARTIAL_KEY]);           // chronological incl. partial
+  var SECTORS = V.sectors.slice();
+  var PEAK_YEAR = FULL_YEARS.reduce(function(best,y){ return (V.fyTotal[y] > V.fyTotal[best]) ? y : best; }, FULL_YEARS[0]);
+  var PEAK_VAL = V.fyTotal[PEAK_YEAR];
+
+  function yearLabel(k){ return k===PARTIAL_KEY ? (PARTIAL_SHORT+' (partial)') : k; }
+  function isPartial(k){ return k===PARTIAL_KEY; }
+
+  var COUNTRIES = (function(){
+    var set={};
+    Object.keys(V.ctySec_latest||{}).forEach(function(c){set[c]=1;});
+    Object.keys(V.byFYcty[LATEST_FULL]||{}).forEach(function(c){set[c]=1;});
+    return Object.keys(set).sort();
+  })();
+
+  var state = { year: LATEST_FULL, country: 'China' };
+
+  // ================= URL state =================
+  function readUrl(){
+    if(!HAS_DC) return {year:null, country:null};
+    return { year: DashCommons.state.get('year', null), country: DashCommons.state.get('country', null) };
+  }
+  function writeUrl(){
+    if(!HAS_DC) return;
+    var yShort = state.year===PARTIAL_KEY ? PARTIAL_SHORT : state.year;
+    DashCommons.state.set('year', yShort!==LATEST_FULL ? yShort : null);
+    DashCommons.state.set('country', state.country!=='China' ? state.country : null);
+  }
+  function resolveYear(param){
+    if(!param) return LATEST_FULL;
+    if(param===PARTIAL_SHORT) return PARTIAL_KEY;
+    if(FULL_YEARS.indexOf(param)!==-1) return param;
+    return LATEST_FULL;
+  }
+  function resolveCountry(param){
+    if(!param) return 'China';
+    if(COUNTRIES.indexOf(param)!==-1) return param;
+    // case-insensitive fallback
+    var target=param.toLowerCase(), found=null;
+    COUNTRIES.forEach(function(c){ if(!found && c.toLowerCase()===target) found=c; });
+    return found || 'China';
+  }
+
+  // ================= controls =================
+  function buildYearSelect(){
+    var sel=document.getElementById('sel-year');
+    var opts = '<option value="'+PARTIAL_SHORT+'">'+PARTIAL_SHORT+' ('+PARTIAL_SUFFIX+', partial)</option>';
+    opts += FULL_YEARS.slice().reverse().map(function(y){
+      return '<option value="'+y+'">'+y+(y===LATEST_FULL?' (latest full)':'')+'</option>';
+    }).join('');
+    sel.innerHTML = opts;
+    sel.value = state.year===PARTIAL_KEY ? PARTIAL_SHORT : state.year;
+    sel.onchange=function(){ state.year = resolveYear(sel.value); writeUrl(); renderYearDependent(); };
+  }
+  function buildCountrySelect(){
+    var sel=document.getElementById('sel-country');
+    sel.innerHTML = COUNTRIES.map(function(c){ return '<option value="'+esc(c)+'">'+esc(c)+'</option>'; }).join('');
+    sel.value = state.country;
+    sel.onchange=function(){ state.country = sel.value; writeUrl(); renderExplorer(); };
+  }
+
+  // ================= 1. KPIs =================
+  function renderKpis(){
+    var y = state.year;
+    var total = V.fyTotal[y] || 0;
+    var deltaAbs = total - PEAK_VAL;
+    var deltaPct = PEAK_VAL ? (deltaAbs/PEAK_VAL*100) : 0;
+    var dc = deltaAbs<0?'down':(deltaAbs>0?'up':'flat');
+    var darrow = deltaAbs<0?'&#9660;':(deltaAbs>0?'&#9650;':'&#8226;');
+    var sec = V.byFYsec[y] || {};
+    var he = sec['Higher Education']||0;
+    var heShare = total ? he/total*100 : 0;
+    var loc = V.byFYloc[y] || {onshore:0, offshore:0};
+    var offShare = total ? loc.offshore/total*100 : 0;
+
+    var box=document.getElementById('kpis');
+    box.innerHTML =
+      card('', 'Total student-visa grants — '+yearLabel(y),
+        fmtInt(total),
+        'Primary applicants, subclass 500' + (isPartial(y) ? ' &middot; partial year to 31 May 2026, not comparable with a full year' : ''), '') +
+      card('k-gold', 'vs 2022-23 peak ('+fmtInt(PEAK_VAL)+')',
+        pct(deltaPct),
+        fmtInt(Math.abs(deltaAbs)) + (deltaAbs<0?' fewer':' more') + ' grants than the '+PEAK_YEAR+' peak',
+        '<span class="kdelta '+dc+'">'+darrow+' '+pct(Math.abs(deltaPct))+' vs peak</span>') +
+      card('k-slate', 'Higher Education share — '+yearLabel(y),
+        pct(heShare),
+        fmtInt(he)+' of '+fmtInt(total)+' grants', '') +
+      card('k-red', 'Offshore share — '+yearLabel(y),
+        pct(offShare),
+        fmtInt(loc.offshore)+' of '+fmtInt(total)+' grants made outside Australia', '');
+  }
+  function card(cls, lbl, val, sub, extra){
+    return '<div class="kpi '+cls+'"><div class="klbl">'+lbl+'</div>'
+      + '<div class="kval">'+val+'</div>'
+      + (sub?'<div class="ksub">'+sub+'</div>':'')
+      + (extra||'') + '</div>';
+  }
+
+  // ================= 2. National trend =================
+  var chTrend=null;
+  function renderTrend(){
+    var labels = FULL_YEARS.concat([PARTIAL_SHORT+'*']);
+    var data = ALL_KEYS.map(function(k){ return V.fyTotal[k]; });
+    var partialIdx = ALL_KEYS.length-1;
+    var PURPLE='#3C1053', GOLD='#B8860B';
+    var ctx=document.getElementById('ch-trend').getContext('2d');
+    if(chTrend) chTrend.destroy();
+    chTrend=new Chart(ctx,{
+      type:'line',
+      data:{ labels: labels,
+        datasets:[{
+          label:'Grants', data:data,
+          borderColor:PURPLE, backgroundColor:'rgba(60,16,83,.08)',
+          borderWidth:2.6, fill:true, tension:.28,
+          pointRadius: ALL_KEYS.map(function(k){return isPartial(k)?6:4;}),
+          pointHoverRadius:8,
+          pointStyle: ALL_KEYS.map(function(k){return isPartial(k)?'rectRot':'circle';}),
+          pointBackgroundColor:'#fff',
+          pointBorderColor: ALL_KEYS.map(function(k){return isPartial(k)?GOLD:PURPLE;}),
+          pointBorderWidth:2.2,
+          segment:{
+            borderDash:function(c){ return c.p1DataIndex===partialIdx ? [7,5] : undefined; },
+            borderColor:function(c){ return c.p1DataIndex===partialIdx ? GOLD : undefined; }
+          }
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{
+          legend:{display:false},
+          tooltip:{ backgroundColor:'#fff', borderColor:'#ede4dc', borderWidth:1,
+            titleColor:'#1E1B18', bodyColor:'#5C5651', padding:11, displayColors:false,
+            callbacks:{
+              title:function(it){ var k=ALL_KEYS[it[0].dataIndex]; return yearLabel(k)+(isPartial(k)?' — to 31 May 2026':''); },
+              label:function(c){ return ' '+fmtInt(c.parsed.y)+' grants'; }
+            }
+          }
+        },
+        scales:{
+          x:{ grid:{display:false}, ticks:{color:'#5C5651', font:{size:10}, maxRotation:60, minRotation:60} },
+          y:{ beginAtZero:true, grid:{color:'rgba(30,27,24,.07)'},
+              ticks:{color:'#5C5651', font:{size:11}, callback:function(v){return (v/1000)+'k';}} }
+        }
+      }
+    });
+    var strip=document.getElementById('strip-trend');
+    strip.innerHTML = ALL_KEYS.map(function(k){
+      return '<div class="strip-c'+(isPartial(k)?' partial':'')+'"><div class="strip-y">'+(isPartial(k)?PARTIAL_SHORT+'*':k)+'</div>'
+        +'<div class="strip-v">'+fmtInt(V.fyTotal[k])+'</div></div>';
+    }).join('');
+    document.getElementById('trend-note').innerHTML =
+      '<b>Reading the shape.</b> Grants collapsed in 2020-21 (COVID border closures), rebounded sharply to a peak of ~500k in '+PEAK_YEAR+
+      ', then tightened through 2023-24 and 2024-25 as Ministerial Direction 107 (then 111), higher financial/English-language requirements, '+
+      'and provider/National Planning Level caps from 2025 took effect. '+esc(V.meta && V.meta.policy ? '' : '');
+  }
+
+  // ================= 3. By sector =================
+  var chSectorShare=null;
+  function renderSector(){
+    document.getElementById('sector-year').textContent = yearLabel(state.year);
+    var sec = V.byFYsec[state.year] || {};
+    var total = V.fyTotal[state.year] || 0;
+    var rows = SECTORS.map(function(s){ return {sector:s, val:sec[s]||0}; }).sort(function(a,b){return b.val-a.val;});
+    var maxVal = Math.max.apply(null, rows.map(function(r){return r.val;}))||1;
+    var host=document.getElementById('bars-sector');
+    host.innerHTML = rows.map(function(r){
+      var w = maxVal? (r.val/maxVal*100):0;
+      var share = total? (r.val/total*100):0;
+      return '<div class="bar-row">'
+        + '<div class="bar-lbl" title="'+esc(r.sector)+'">'+esc(r.sector)+'</div>'
+        + '<div class="bar-track"><div class="bar-fill" style="width:'+Math.max(w,r.val>0?1.5:0).toFixed(2)+'%"></div></div>'
+        + '<div class="bar-val"><b>'+fmtInt(r.val)+'</b> &middot; <span class="rate">'+pct(share)+'</span></div>'
+        + '</div>';
+    }).join('');
+
+    // sector share over time — Higher Education vs VET
+    var heShares = ALL_KEYS.map(function(k){ var t=V.fyTotal[k]||0, s=(V.byFYsec[k]||{})['Higher Education']||0; return t? +(s/t*100).toFixed(1):0; });
+    var vetShares = ALL_KEYS.map(function(k){ var t=V.fyTotal[k]||0, s=(V.byFYsec[k]||{})['VET']||0; return t? +(s/t*100).toFixed(1):0; });
+    var labels = FULL_YEARS.concat([PARTIAL_SHORT+'*']);
+    var partialIdx = ALL_KEYS.length-1;
+    var PURPLE='#3C1053', RED='#F2120C';
+    var ctx=document.getElementById('ch-sector-share').getContext('2d');
+    if(chSectorShare) chSectorShare.destroy();
+    chSectorShare=new Chart(ctx,{
+      type:'line',
+      data:{ labels:labels, datasets:[
+        { label:'Higher Education', data:heShares, borderColor:PURPLE, backgroundColor:PURPLE, borderWidth:2.2, fill:false, tension:.25,
+          pointRadius:2.5, pointHoverRadius:6, pointBackgroundColor:'#fff', pointBorderColor:PURPLE, pointBorderWidth:1.8,
+          segment:{ borderDash:function(c){return c.p1DataIndex===partialIdx?[6,4]:undefined;} } },
+        { label:'VET', data:vetShares, borderColor:RED, backgroundColor:RED, borderWidth:2.2, fill:false, tension:.25,
+          pointRadius:2.5, pointHoverRadius:6, pointBackgroundColor:'#fff', pointBorderColor:RED, pointBorderWidth:1.8,
+          segment:{ borderDash:function(c){return c.p1DataIndex===partialIdx?[6,4]:undefined;} } }
+      ]},
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{
+          legend:{position:'top', labels:{usePointStyle:true, padding:12, color:'#1E1B18', font:{size:10}, boxWidth:8}},
+          tooltip:{ backgroundColor:'#fff', borderColor:'#ede4dc', borderWidth:1, titleColor:'#1E1B18', bodyColor:'#5C5651', padding:10,
+            callbacks:{ title:function(it){ var k=ALL_KEYS[it[0].dataIndex]; return yearLabel(k); },
+              label:function(c){ return ' '+c.dataset.label+': '+c.parsed.y.toFixed(1)+'%'; } } }
+        },
+        scales:{
+          x:{ grid:{display:false}, ticks:{color:'#5C5651', font:{size:8}, maxRotation:60, minRotation:60, autoSkip:true, maxTicksLimit:11} },
+          y:{ beginAtZero:true, suggestedMax:80, grid:{color:'rgba(30,27,24,.07)'}, ticks:{color:'#5C5651', font:{size:10}, callback:function(v){return v+'%';}} }
+        }
+      }
+    });
+  }
+
+  // ================= 4. Top source countries =================
+  function renderCountries(){
+    document.getElementById('cty-year').textContent = yearLabel(state.year);
+    var cty = V.byFYcty[state.year] || {};
+    var total = V.fyTotal[state.year] || 0;
+    var rows = Object.keys(cty).map(function(c){ return {country:c, val:cty[c]}; }).sort(function(a,b){return b.val-a.val;}).slice(0,15);
+    var maxVal = rows.length? rows[0].val : 1;
+    var host=document.getElementById('bars-country');
+    if(!rows.length){ host.innerHTML='<div class="empty">No country data for '+esc(yearLabel(state.year))+'.</div>'; return; }
+    host.innerHTML = rows.map(function(r){
+      var w = maxVal? (r.val/maxVal*100):0;
+      var share = total? (r.val/total*100):0;
+      return '<div class="bar-row">'
+        + '<div class="bar-lbl" title="'+esc(r.country)+'">'+esc(r.country)+'</div>'
+        + '<div class="bar-track"><div class="bar-fill red" style="width:'+Math.max(w,1.5).toFixed(2)+'%"></div></div>'
+        + '<div class="bar-val"><b>'+fmtInt(r.val)+'</b> &middot; <span class="rate">'+pct(share)+'</span></div>'
+        + '</div>';
+    }).join('');
+  }
+
+  // ================= 5. Country explorer =================
+  var chCountry=null;
+  function renderExplorer(){
+    document.getElementById('exp-title').textContent = 'Country explorer — '+state.country;
+    document.getElementById('sel-country').value = state.country;
+
+    var data = ALL_KEYS.map(function(k){ return (V.byFYcty[k]||{})[state.country]||0; });
+    var labels = FULL_YEARS.concat([PARTIAL_SHORT+'*']);
+    var partialIdx = ALL_KEYS.length-1;
+    var PURPLE='#3C1053', GOLD='#B8860B';
+    var ctx=document.getElementById('ch-country').getContext('2d');
+    if(chCountry) chCountry.destroy();
+    chCountry=new Chart(ctx,{
+      type:'line',
+      data:{ labels:labels, datasets:[{
+        label:state.country, data:data,
+        borderColor:PURPLE, backgroundColor:'rgba(60,16,83,.08)',
+        borderWidth:2.4, fill:true, tension:.28,
+        pointRadius: ALL_KEYS.map(function(k){return isPartial(k)?6:3.5;}),
+        pointHoverRadius:7,
+        pointStyle: ALL_KEYS.map(function(k){return isPartial(k)?'rectRot':'circle';}),
+        pointBackgroundColor:'#fff',
+        pointBorderColor: ALL_KEYS.map(function(k){return isPartial(k)?GOLD:PURPLE;}),
+        pointBorderWidth:2,
+        segment:{
+          borderDash:function(c){ return c.p1DataIndex===partialIdx ? [7,5] : undefined; },
+          borderColor:function(c){ return c.p1DataIndex===partialIdx ? GOLD : undefined; }
+        }
+      }]},
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{
+          legend:{display:false},
+          tooltip:{ backgroundColor:'#fff', borderColor:'#ede4dc', borderWidth:1, titleColor:'#1E1B18', bodyColor:'#5C5651', padding:11, displayColors:false,
+            callbacks:{ title:function(it){ var k=ALL_KEYS[it[0].dataIndex]; return yearLabel(k)+(isPartial(k)?' — to 31 May 2026':''); },
+              label:function(c){ return ' '+fmtInt(c.parsed.y)+' grants'; } } }
+        },
+        scales:{
+          x:{ grid:{display:false}, ticks:{color:'#5C5651', font:{size:9}, maxRotation:60, minRotation:60, autoSkip:true, maxTicksLimit:11} },
+          y:{ beginAtZero:true, grid:{color:'rgba(30,27,24,.07)'}, ticks:{color:'#5C5651', font:{size:11}} }
+        }
+      }
+    });
+
+    var mix = V.ctySec_latest[state.country] || {};
+    var mixTotal = SECTORS.reduce(function(s,sec){ return s+(mix[sec]||0); },0);
+    var rows = SECTORS.map(function(s){ return {sector:s, val:mix[s]||0}; }).sort(function(a,b){return b.val-a.val;});
+    var maxVal = Math.max.apply(null, rows.map(function(r){return r.val;}))||1;
+    var host=document.getElementById('bars-exp-sector');
+    host.innerHTML = rows.map(function(r){
+      var w = maxVal? (r.val/maxVal*100):0;
+      var share = mixTotal? (r.val/mixTotal*100):0;
+      return '<div class="bar-row">'
+        + '<div class="bar-lbl" title="'+esc(r.sector)+'">'+esc(r.sector)+'</div>'
+        + '<div class="bar-track"><div class="bar-fill" style="width:'+Math.max(w,r.val>0?1.5:0).toFixed(2)+'%"></div></div>'
+        + '<div class="bar-val"><b>'+fmtInt(r.val)+'</b> &middot; <span class="rate">'+pct(share)+'</span></div>'
+        + '</div>';
+    }).join('');
+  }
+
+  // ================= 6. Onshore / offshore =================
+  function renderLoc(){
+    document.getElementById('loc-year').textContent = yearLabel(state.year);
+    var loc = V.byFYloc[state.year] || {onshore:0, offshore:0};
+    var total = loc.onshore + loc.offshore;
+    var onPct = total? loc.onshore/total*100 : 0;
+    var offPct = total? loc.offshore/total*100 : 0;
+    var host=document.getElementById('duo-loc');
+    host.innerHTML =
+      '<div class="duo-seg on" style="width:'+onPct.toFixed(2)+'%">'+(onPct>10?(pct(onPct,1)+' onshore'):'')+'</div>'
+      + '<div class="duo-seg off" style="width:'+offPct.toFixed(2)+'%">'+(offPct>10?(pct(offPct,1)+' offshore'):'')+'</div>';
+
+    var strip=document.getElementById('strip-loc');
+    strip.innerHTML = ALL_KEYS.map(function(k){
+      var l = V.byFYloc[k] || {onshore:0, offshore:0};
+      var t = l.onshore+l.offshore;
+      var op = t? (l.offshore/t*100) : 0;
+      return '<div class="strip-c'+(isPartial(k)?' partial':'')+'"><div class="strip-y">'+(isPartial(k)?PARTIAL_SHORT+'*':k)+'</div>'
+        +'<div class="strip-v">'+op.toFixed(0)+'%</div></div>';
+    }).join('');
+  }
+
+  // ================= CSV export =================
+  function exportCsv(){
+    var header=['dimension','year','key','grants'];
+    var rows=[header];
+    ALL_KEYS.forEach(function(k){
+      rows.push(['fyTotal', k, 'Total', V.fyTotal[k]]);
+    });
+    var y = state.year;
+    SECTORS.forEach(function(s){
+      rows.push(['byFYsec', y, s, (V.byFYsec[y]||{})[s]||0]);
+    });
+    var cty = V.byFYcty[y] || {};
+    Object.keys(cty).sort().forEach(function(c){
+      rows.push(['byFYcty', y, c, cty[c]]);
+    });
+    var loc = V.byFYloc[y] || {onshore:0, offshore:0};
+    ['onshore','offshore'].forEach(function(l){
+      rows.push(['byFYloc', y, l, loc[l]||0]);
+    });
+    var csv=rows.map(function(r){ return r.map(function(v){ var s=String(v); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }).join(','); }).join('\n');
+    var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url; a.download='intl-student-demand-'+(y===PARTIAL_KEY?PARTIAL_SHORT+'-partial':y)+'.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // ================= render orchestration =================
+  function renderYearDependent(){ renderKpis(); renderSector(); renderCountries(); renderLoc(); }
+  function renderAll(){
+    renderKpis(); renderTrend(); renderSector(); renderCountries(); renderExplorer(); renderLoc();
+    document.getElementById('foot').innerHTML =
+      '<b>Source.</b> '+esc(V.source)+'. Measure: '+esc(V.measure)+'. Generated '+esc(V.generated)+'. '
+      + 'Part of Phil&rsquo;s dashboard suite &mdash; complements the CRICOS course-supply dashboard.';
+  }
+
+  // ================= init =================
+  function boot(){
+    document.getElementById('btn-csv').onclick=exportCsv;
+
+    var u=readUrl();
+    state.year = resolveYear(u.year);
+    state.country = resolveCountry(u.country);
+
+    buildYearSelect();
+    buildCountrySelect();
+    renderAll();
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+</body>
+</html>
