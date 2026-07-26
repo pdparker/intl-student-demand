@@ -3,7 +3,7 @@
   "title": "International Student Demand",
   "url": "https://pdparker.github.io/intl-student-demand/",
   "repo": "pdparker/intl-student-demand",
-  "lastBuild": "2026-07-20",
+  "lastBuild": "2026-07-27",
   "dataSources": [
     { "name": "Dept of Home Affairs — BP0015 Student visas granted (subclass 500), via data.gov.au", "vintage": "financial years 2005-06 to 2024-25 + 2025-26 partial (locked at 31 May 2026)" }
   ],

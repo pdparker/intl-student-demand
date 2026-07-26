@@ -12,7 +12,7 @@
 <style>
 :root{
   --purple:#3C1053; --purple-2:#5A2A78; --purple-lite:#6E4B9E;
-  --red:#F2120C; --red-soft:rgba(242,18,12,.10);
+  --red:#F2120C; --red-dark:#C10E09; --red-soft:rgba(242,18,12,.10);
   --sand:#FBF6F0; --sand-2:#F3EBE1; --card:#FFFFFF;
   --ink:#1E1B18; --muted:#5C5651; --line:rgba(30,27,24,.10);
   --gold:#B8860B; --slate:#3E6D8E; --ok:#2E7D5B;
@@ -44,7 +44,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
 .kval{font-family:'Manrope';font-size:2.15rem;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--ink);}
 .ksub{font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.4;}
 .kdelta{font-size:.72rem;font-weight:700;margin-top:6px;display:inline-flex;align-items:center;gap:4px;}
-.kdelta.down{color:var(--red);} .kdelta.up{color:var(--ok);} .kdelta.flat{color:var(--muted);}
+.kdelta.down{color:var(--red-dark);} .kdelta.up{color:var(--ok);} .kdelta.flat{color:var(--muted);}
 /* ── Cards ── */
 .card{background:var(--card);border-radius:14px;padding:22px 24px;box-shadow:0 4px 22px rgba(60,16,83,.06);border:1px solid var(--line);margin-bottom:20px;}
 .card-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
@@ -97,20 +97,30 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
 .footnote{font-size:.68rem;color:var(--muted);margin-top:12px;line-height:1.5;font-style:italic;}
 .foot{font-size:.7rem;color:var(--muted);line-height:1.6;padding:8px 4px 0;border-top:1px solid var(--line);margin-top:8px;}
 .foot b{color:var(--ink);}
-.sec-eyebrow{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:14px;padding-top:6px;}
+.sec-eyebrow{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red-dark);margin-bottom:14px;padding-top:6px;}
 .empty{font-size:.8rem;color:var(--muted);font-style:italic;padding:20px 0;text-align:center;}
 .subhd{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;}
 @media(max-width:1080px){.krow{grid-template-columns:repeat(2,1fr);}.grid-2{grid-template-columns:1fr;}.bar-row{grid-template-columns:150px 1fr 130px;}}
 @media(max-width:620px){.main{padding:16px;}.masthead{padding:18px 16px;}.krow{grid-template-columns:1fr;}.bar-row{grid-template-columns:120px 1fr;}.bar-val{grid-column:1/-1;text-align:left;}.mh-ctrls{width:100%;}.ctrl select{min-width:0;width:100%;}}
+.print-only{display:none;}
 @media print{
+  @page{margin:14mm;}
   .mh-ctrls,.chips,.btn-csv{display:none!important;}
-  .card,.kpi,.caveats{break-inside:avoid;box-shadow:none;}
+  .card,.kpi,.caveats{break-inside:avoid;page-break-inside:avoid;box-shadow:none;}
   body{background:#fff;}
-  .masthead{background:var(--purple)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .masthead{background:#fff!important;color:var(--ink)!important;padding:0 0 12px;border-bottom:2px solid var(--purple);}
+  .masthead .mh-sub{color:var(--muted)!important;}
+  .print-only{display:block;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--ink);font-family:Arial,Helvetica,sans-serif;font-size:11px;color:var(--ink);}
+  .print-only strong{font-size:13px;}
+  .bar-fill,.swatch,.tag,.strip-c,.kdelta,.kpi,.duo-seg{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 }
 </style>
 </head>
 <body>
+<div class="print-only">
+  <strong>International Student Demand — Visa Grants</strong><br>
+  Printed from pdparker.github.io/intl-student-demand/ — <span class="print-date"></span>
+</div>
 <header class="masthead">
   <div class="mh-top">
     <div>
@@ -236,6 +246,11 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
   "use strict";
   var V = window.VISADEMAND;
   var HAS_DC = (typeof DashCommons !== 'undefined');
+
+  var printDateEl = document.querySelector('.print-date');
+  if (printDateEl) {
+    printDateEl.textContent = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
 
   // ---- helpers ----
   function fmtInt(n){ return Number(n||0).toLocaleString('en-AU'); }
