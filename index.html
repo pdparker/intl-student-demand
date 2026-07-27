@@ -32,6 +32,10 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
 .ctrl select option{color:#1E1B18;}
 .btn-csv{font-family:Arial,Helvetica,sans-serif;font-size:.78rem;font-weight:700;color:#fff;background:var(--red);border:none;border-radius:8px;padding:9px 16px;cursor:pointer;align-self:flex-end;white-space:nowrap;transition:filter .15s;}
 .btn-csv:hover{filter:brightness(1.08);}
+.btn-png{font-family:Arial,Helvetica,sans-serif;font-size:.7rem;font-weight:700;color:var(--purple);background:#fff;border:1px solid rgba(60,16,83,.25);border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:filter .15s,background .15s;display:inline-flex;align-items:center;gap:5px;flex:0 0 auto;}
+.btn-png:hover{background:var(--sand-2);}
+.subhd-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.subhd-row .subhd{margin-bottom:0;}
 /* ── KPI row ── */
 .main{padding:22px 32px 56px;max-width:1500px;margin:0 auto;}
 .krow{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px;}
@@ -105,7 +109,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
 .print-only{display:none;}
 @media print{
   @page{margin:14mm;}
-  .mh-ctrls,.chips,.btn-csv{display:none!important;}
+  .mh-ctrls,.chips,.btn-csv,.btn-png{display:none!important;}
   .card,.kpi,.caveats{break-inside:avoid;page-break-inside:avoid;box-shadow:none;}
   body{background:#fff;}
   .masthead{background:#fff!important;color:var(--ink)!important;padding:0 0 12px;border-bottom:2px solid var(--purple);}
@@ -148,6 +152,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
         <div class="card-t">National trend — visa grants by financial year</div>
         <div class="card-s" id="trend-sub">Primary student-visa grants, 2005-06 to 2024-25. The final point is the 2025-26 partial year (to 31 May 2026) — dashed and hollow, not comparable with a full year.</div>
       </div>
+      <button class="btn-png" id="btn-png-trend" type="button">&#8681; Download PNG</button>
     </div>
     <div class="chart-wrap tall"><canvas id="ch-trend"></canvas></div>
     <div class="strip" id="strip-trend"></div>
@@ -165,7 +170,10 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
     <div class="grid-2">
       <div class="bars" id="bars-sector"></div>
       <div>
-        <div class="subhd">Sector share of total grants, by year</div>
+        <div class="subhd-row">
+          <div class="subhd">Sector share of total grants, by year</div>
+          <button class="btn-png" id="btn-png-sector" type="button">&#8681; PNG</button>
+        </div>
         <div class="chart-wrap small"><canvas id="ch-sector-share"></canvas></div>
       </div>
     </div>
@@ -197,7 +205,10 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
     </div>
     <div class="grid-2">
       <div>
-        <div class="subhd">Grants by year</div>
+        <div class="subhd-row">
+          <div class="subhd">Grants by year</div>
+          <button class="btn-png" id="btn-png-country" type="button">&#8681; PNG</button>
+        </div>
         <div class="chart-wrap"><canvas id="ch-country"></canvas></div>
       </div>
       <div>
@@ -617,6 +628,22 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
   // ================= init =================
   function boot(){
     document.getElementById('btn-csv').onclick=exportCsv;
+    document.getElementById('btn-png-trend').onclick=function(){
+      if(!chTrend || !HAS_DC) return;
+      var url=chTrend.toBase64Image('image/png',1);
+      DashCommons.downloadFile(url,'intl-student-demand-national-trend-'+new Date().toISOString().slice(0,10)+'.png');
+    };
+    document.getElementById('btn-png-sector').onclick=function(){
+      if(!chSectorShare || !HAS_DC) return;
+      var url=chSectorShare.toBase64Image('image/png',1);
+      DashCommons.downloadFile(url,'intl-student-demand-sector-share-'+new Date().toISOString().slice(0,10)+'.png');
+    };
+    document.getElementById('btn-png-country').onclick=function(){
+      if(!chCountry || !HAS_DC) return;
+      var slug=String(state.country||'country').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+      var url=chCountry.toBase64Image('image/png',1);
+      DashCommons.downloadFile(url,'intl-student-demand-country-trend-'+slug+'-'+new Date().toISOString().slice(0,10)+'.png');
+    };
 
     var u=readUrl();
     state.year = resolveYear(u.year);
