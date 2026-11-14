@@ -37,10 +37,10 @@ SECTORS=['Higher Education','VET','ELICOS','Postgraduate Research','Schools','No
 loc={fy:{'onshore':v.get('In Australia',0),'offshore':v.get('Outside Australia',0)} for fy,v in d['byFYloc'].items()}
 
 out={
- 'generated':'2026-07-20',
- 'source':'Department of Home Affairs, BP0015 Student visas granted (subclass 500), via data.gov.au — locked at 31 May 2026',
+ 'generated':'2026-11-14',
+ 'source':'Department of Home Affairs, BP0015 Student visas granted (subclass 500), via data.gov.au — locked at 30 Sep 2026',
  'measure':'Primary student visa grants (excludes dependants/secondary applicants)',
- 'full_years':d['full_years'], 'partial_label':d['partial'], 'latest_full':'2024-25',
+ 'full_years':d['full_years'], 'partial_label':d['partial'], 'latest_full':'2025-26',
  'sectors':SECTORS,
  'fyTotal':d['fyTotal'],
  'byFYsec':d['byFYsec'],
@@ -49,13 +49,13 @@ out={
  'byFYloc':loc,
  'meta':{
    'note':'Counts are visa GRANTS (offers accepted into a visa), a demand-realised signal — not applications or enrolments. Primary applicants only (the students); dependants excluded. Sector = the education sector of the course the visa was granted for. No individual-provider detail is published, so this is national/sector, not institution-level. Complements CRICOS course supply: this is who is granted visas to come, by source country and sector.',
-   'partial':'2025-26 is a partial year (to 31 May 2026) — do not compare its total to full years.',
-   'policy':'The 2022-23 peak (~500k) reflects the post-COVID rebound; the fall through 2023-24/2024-25 reflects tightened settings (Ministerial Direction 107 then 111, higher financial/English requirements, and NOSC caps from 2025).'
+   'partial':'2026-27 is a partial year (to 30 September 2026) — do not compare its total to full years.',
+   'policy':'The 2022-23 peak (~500k) reflects the post-COVID rebound; the fall through 2023-24 to 2025-26 reflects tightened settings (Ministerial Direction 107 then 111, higher financial/English requirements, and NOSC caps from 2025).'
  }
 }
 with open('visa_data.js','w') as f:
     f.write('window.VISADEMAND = '); json.dump(out,f,separators=(',',':')); f.write(';\n')
 import os
 print('visa_data.js', os.path.getsize('visa_data.js'),'bytes')
-print('top 2024-25:', sorted(byFYcty['2024-25'].items(),key=lambda x:-x[1])[:5])
-print('sector share 2024-25 HE%:', round(d['byFYsec']['2024-25']['Higher Education']/d['fyTotal']['2024-25']*100,1))
+print('top 2025-26:', sorted(byFYcty['2025-26'].items(),key=lambda x:-x[1])[:5])
+print('sector share 2025-26 HE%:', round(d['byFYsec']['2025-26']['Higher Education']/d['fyTotal']['2025-26']*100,1))

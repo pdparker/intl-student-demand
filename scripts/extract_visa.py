@@ -16,8 +16,8 @@ for cf in fields:
 names=[cf.attrib['name'] for cf in fields]
 FY,LOC,SEC,APP,CTY,TOT = names.index('Financial Year of Visa Grant'),names.index('Client Location'),names.index('Sector'),names.index('Applicant Type'),names.index('Citizenship Country'),names.index('Total')
 
-FULL=['2005-06','2006-07','2007-08','2008-09','2009-10','2010-11','2011-12','2012-13','2013-14','2014-15','2015-16','2016-17','2017-18','2018-19','2019-20','2020-21','2021-22','2022-23','2023-24','2024-25']
-PARTIAL='2025-26 to 31 May 2026'
+FULL=['2005-06','2006-07','2007-08','2008-09','2009-10','2010-11','2011-12','2012-13','2013-14','2014-15','2015-16','2016-17','2017-18','2018-19','2019-20','2020-21','2021-22','2022-23','2023-24','2024-25','2025-26']
+PARTIAL='2026-27 to 30 September 2026'
 KEEP=set(FULL+[PARTIAL])
 SEC_SHORT={'Higher Education Sector':'Higher Education','Vocational Education and Training Sector':'VET','Independent ELICOS Sector':'ELICOS','Schools Sector':'Schools','Non-Award Sector':'Non-Award','Postgraduate Research Sector':'Postgraduate Research','Foreign Affairs or Defence Sector':'Foreign Affairs/Defence'}
 
@@ -44,7 +44,7 @@ with z.open('xl/pivotCache/pivotCacheRecords1.xml') as f:
                 byFYcty.setdefault(fy,{}); byFYcty[fy][cty]=byFYcty[fy].get(cty,0)+tot
                 byFYloc.setdefault(fy,{}); byFYloc[fy][loc]=byFYloc[fy].get(loc,0)+tot
                 fyTotal[fy]=fyTotal.get(fy,0)+tot
-                if fy=='2024-25':
+                if fy=='2025-26':
                     ctySec_latest.setdefault(cty,{}); ctySec_latest[cty][sec]=ctySec_latest[cty].get(sec,0)+tot
         el.clear()
         n+=1
@@ -53,5 +53,5 @@ with z.open('xl/pivotCache/pivotCacheRecords1.xml') as f:
 json.dump({'byFYsec':byFYsec,'byFYcty':byFYcty,'byFYloc':byFYloc,'ctySec_latest':ctySec_latest,'fyTotal':fyTotal,
            'full_years':FULL,'partial':PARTIAL}, open('visa_agg.json','w'))
 print('done', n, 'records in', round(time.time()-t0), 's')
-print('FY totals (Primary):', {k:fyTotal[k] for k in FULL[-5:]+[PARTIAL]})
-print('sectors 2024-25:', byFYsec.get('2024-25'))
+print('FY totals (Primary):', {k:fyTotal[k] for k in FULL[-6:]+[PARTIAL]})
+print('sectors 2025-26:', byFYsec.get('2025-26'))

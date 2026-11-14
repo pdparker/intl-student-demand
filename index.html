@@ -150,7 +150,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
     <div class="card-hd">
       <div>
         <div class="card-t">National trend — visa grants by financial year</div>
-        <div class="card-s" id="trend-sub">Primary student-visa grants, 2005-06 to 2024-25. The final point is the 2025-26 partial year (to 31 May 2026) — dashed and hollow, not comparable with a full year.</div>
+        <div class="card-s" id="trend-sub">Primary student-visa grants, 2005-06 to 2025-26. The final point is the 2026-27 partial year (to 30 September 2026) — dashed and hollow, not comparable with a full year.</div>
       </div>
       <button class="btn-png" id="btn-png-trend" type="button">&#8681; Download PNG</button>
     </div>
@@ -163,7 +163,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
   <div class="card">
     <div class="card-hd">
       <div>
-        <div class="card-t">By sector — <span id="sector-year">2024-25</span></div>
+        <div class="card-t">By sector — <span id="sector-year">2025-26</span></div>
         <div class="card-s">Grants by education sector for the selected year, ranked. Right: the Higher Education vs VET share swing over the full series — the most consequential sector shift in the data.</div>
       </div>
     </div>
@@ -183,7 +183,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
   <div class="card">
     <div class="card-hd">
       <div>
-        <div class="card-t">Top source countries — <span id="cty-year">2024-25</span></div>
+        <div class="card-t">Top source countries — <span id="cty-year">2025-26</span></div>
         <div class="card-s">Top 15 source countries by primary student-visa grants for the selected year, with each country's share of that year's national total.</div>
       </div>
     </div>
@@ -196,7 +196,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
     <div class="card-hd">
       <div>
         <div class="card-t" id="exp-title">Country explorer — China</div>
-        <div class="card-s">Grant trend for one source country across the full series, and its sector mix in the latest full year (2024-25) — nationalities differ sharply in which sector they enter.</div>
+        <div class="card-s">Grant trend for one source country across the full series, and its sector mix in the latest full year (2025-26) — nationalities differ sharply in which sector they enter.</div>
       </div>
       <div class="chips">
         <span class="chip-lbl">Country</span>
@@ -212,7 +212,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
         <div class="chart-wrap"><canvas id="ch-country"></canvas></div>
       </div>
       <div>
-        <div class="subhd" id="exp-sector-hd">Sector mix — 2024-25 (latest full year)</div>
+        <div class="subhd" id="exp-sector-hd">Sector mix — 2025-26 (latest full year)</div>
         <div class="bars" id="bars-exp-sector"></div>
       </div>
     </div>
@@ -222,7 +222,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
   <div class="card">
     <div class="card-hd">
       <div>
-        <div class="card-t">Onshore / offshore — <span id="loc-year">2024-25</span></div>
+        <div class="card-t">Onshore / offshore — <span id="loc-year">2025-26</span></div>
         <div class="card-s">Share of grants made <b>in</b> Australia (onshore — largely transitions and further study by people already here) vs <b>outside</b> Australia (offshore — genuinely new arrivals), for the selected year, with offshore share over the full series below.</div>
       </div>
     </div>
@@ -242,7 +242,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
       <li><b>These are visa GRANTS, not applications and not enrolments.</b> A grant means a subclass 500 student visa was issued — it is a demand-<i>realised</i> signal (who was let in), one step removed from who applied and one step further from who enrolled or commenced study.</li>
       <li><b>Primary applicants only.</b> Dependants (partners, children — secondary applicants) travelling with the student are excluded from every count on this page.</li>
       <li><b>National / sector / source-country only — no institution or provider detail.</b> Home Affairs publishes the provider's <i>state</i> but not individual providers, so there is no institution-level or ACU view here. This is macro demand intelligence, not a provider dashboard.</li>
-      <li><b>2025-26 is a partial year</b> (to 31 May 2026 only) — shown dashed throughout and never compared directly against a full financial year's total.</li>
+      <li><b>2026-27 is a partial year</b> (to 30 September 2026 only) — shown dashed throughout and never compared directly against a full financial year's total.</li>
       <li><b>Policy context.</b> The 2022-23 peak (~500k) was the post-COVID rebound; the fall since reflects tightened settings — Ministerial Direction 107, then 111, higher financial and English-language requirements, and National Planning Level / provider caps from 2025.</li>
       <li><b>Complements, but does not join, CRICOS.</b> CRICOS is course <i>supply</i> with no nationality data; this is visa <i>demand</i> with no course/provider data. They are separate datasets presented side by side — a demand&times;supply join is a possible future dashboard, not this one.</li>
     </ul>
@@ -272,7 +272,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
   var FULL_YEARS = V.full_years.slice();                    // ascending, 20 full FYs
   var PARTIAL_KEY = Object.keys(V.fyTotal).filter(function(k){ return FULL_YEARS.indexOf(k)===-1; })[0];
   var PARTIAL_SHORT = PARTIAL_KEY.split(' to ')[0];          // "2025-26"
-  var PARTIAL_SUFFIX = PARTIAL_KEY.slice(PARTIAL_KEY.indexOf(' to ')).trim(); // "to 31 May 2026"
+  var PARTIAL_SUFFIX = PARTIAL_KEY.slice(PARTIAL_KEY.indexOf(' to ')).trim(); // "to 30 September 2026"
   var LATEST_FULL = V.latest_full;
   var ALL_KEYS = FULL_YEARS.concat([PARTIAL_KEY]);           // chronological incl. partial
   var SECTORS = V.sectors.slice();
@@ -353,7 +353,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
     box.innerHTML =
       card('', 'Total student-visa grants — '+yearLabel(y),
         fmtInt(total),
-        'Primary applicants, subclass 500' + (isPartial(y) ? ' &middot; partial year to 31 May 2026, not comparable with a full year' : ''), '') +
+        'Primary applicants, subclass 500' + (isPartial(y) ? ' &middot; partial year to 30 September 2026, not comparable with a full year' : ''), '') +
       card('k-gold', 'vs 2022-23 peak ('+fmtInt(PEAK_VAL)+')',
         pct(deltaPct),
         fmtInt(Math.abs(deltaAbs)) + (deltaAbs<0?' fewer':' more') + ' grants than the '+PEAK_YEAR+' peak',
@@ -408,7 +408,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
           tooltip:{ backgroundColor:'#fff', borderColor:'#ede4dc', borderWidth:1,
             titleColor:'#1E1B18', bodyColor:'#5C5651', padding:11, displayColors:false,
             callbacks:{
-              title:function(it){ var k=ALL_KEYS[it[0].dataIndex]; return yearLabel(k)+(isPartial(k)?' — to 31 May 2026':''); },
+              title:function(it){ var k=ALL_KEYS[it[0].dataIndex]; return yearLabel(k)+(isPartial(k)?' — '+PARTIAL_SUFFIX:''); },
               label:function(c){ return ' '+fmtInt(c.parsed.y)+' grants'; }
             }
           }
@@ -427,7 +427,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
     }).join('');
     document.getElementById('trend-note').innerHTML =
       '<b>Reading the shape.</b> Grants collapsed in 2020-21 (COVID border closures), rebounded sharply to a peak of ~500k in '+PEAK_YEAR+
-      ', then tightened through 2023-24 and 2024-25 as Ministerial Direction 107 (then 111), higher financial/English-language requirements, '+
+      ', then tightened through 2023-24, 2024-25 and 2025-26 as Ministerial Direction 107 (then 111), higher financial/English-language requirements, '+
       'and provider/National Planning Level caps from 2025 took effect. '+esc(V.meta && V.meta.policy ? '' : '');
   }
 
@@ -540,7 +540,7 @@ h1,h2,h3,.mono{font-family:'Manrope',Arial,Helvetica,sans-serif;}
         plugins:{
           legend:{display:false},
           tooltip:{ backgroundColor:'#fff', borderColor:'#ede4dc', borderWidth:1, titleColor:'#1E1B18', bodyColor:'#5C5651', padding:11, displayColors:false,
-            callbacks:{ title:function(it){ var k=ALL_KEYS[it[0].dataIndex]; return yearLabel(k)+(isPartial(k)?' — to 31 May 2026':''); },
+            callbacks:{ title:function(it){ var k=ALL_KEYS[it[0].dataIndex]; return yearLabel(k)+(isPartial(k)?' — '+PARTIAL_SUFFIX:''); },
               label:function(c){ return ' '+fmtInt(c.parsed.y)+' grants'; } } }
         },
         scales:{

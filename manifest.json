@@ -3,9 +3,12 @@
   "title": "International Student Demand",
   "url": "https://pdparker.github.io/intl-student-demand/",
   "repo": "pdparker/intl-student-demand",
-  "lastBuild": "2026-07-27",
+  "lastBuild": "2026-11-14",
   "dataSources": [
-    { "name": "Dept of Home Affairs — BP0015 Student visas granted (subclass 500), via data.gov.au", "vintage": "financial years 2005-06 to 2024-25 + 2025-26 partial (locked at 31 May 2026)" }
+    {
+      "name": "Dept of Home Affairs — BP0015 Student visas granted (subclass 500), via data.gov.au",
+      "vintage": "financial years 2005-06 to 2025-26 + 2026-27 partial (locked at 30 Sep 2026)"
+    }
   ],
-  "notes": "Counts are visa GRANTS to primary applicants (the students; dependants excluded) — a demand-realised signal, not applications or enrolments. National/sector by source country; no individual-provider detail is published, so there is no institution-level view. Complements CRICOS course supply. 2025-26 is a partial year."
+  "notes": "Counts are visa GRANTS to primary applicants (the students; dependants excluded) — a demand-realised signal, not applications or enrolments. National/sector by source country; no individual-provider detail is published, so there is no institution-level view. Complements CRICOS course supply. 2026-27 is a partial year (to 30 September 2026)."
 }
